@@ -1,6 +1,7 @@
 package com.netsensia.rivalchess.recorder
 
 import com.google.gson.Gson
+import com.netsensia.rivalchess.recorder.model.MatchUpMessageItem
 import com.netsensia.rivalchess.recorder.model.Result
 import com.netsensia.rivalchess.recorder.service.ResultService
 import com.netsensia.rivalchess.utils.JmsReceiver
@@ -12,6 +13,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.stereotype.Component
+import kotlin.streams.toList
 
 @SpringBootApplication
 @Component
@@ -60,7 +62,15 @@ class SpringBootConsoleApplication : CommandLineRunner {
             )
             resultService.save(entity)
             val matchUps = resultService.getMatchStats()
-            if (matchUps != null) JmsSender.send("StatisticsUpdated", matchUps)
+            if (matchUps != null) {
+
+                val matchUpMessage = matchUps.stream().map {
+                    MatchUpMessageItem(it.engine1, it.engine2, it.result, it.cnt)
+                }.toList()
+
+                println(matchUpMessage)
+                //JmsSender.send("StatisticsUpdated", matchUps)
+            }
             println("Running Catch Up")
             catchUp()
         } while (true)

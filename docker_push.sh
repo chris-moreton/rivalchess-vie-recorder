@@ -6,8 +6,7 @@ fi
 
 AWS_REGION="eu-west-2"
 
-./gradlew clean build -x test
-docker build --build-arg JAR_FILE=build/libs/*.jar -t rivalchess-vie-recorder .
+./docker_build.sh
 aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 AWS_ECR_BASE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 

@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service
 @Component
 class ResultService(private val repository: ResultRepository) {
     fun save(result: Result) {
-        println("Saving")
         repository.save(result)
     }
+
+    fun getOldVersions(version: Int) = repository.findAllOldVersions(version)
+
+    fun getMatchStats() = repository.getMatchStats()
+
 }

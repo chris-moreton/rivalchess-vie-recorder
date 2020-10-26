@@ -1,7 +1,9 @@
 package com.netsensia.rivalchess.recorder.service
 
+import com.netsensia.rivalchess.vie.model.EngineRanking
 import com.netsensia.rivalchess.vie.model.MatchUpStats
 
 data class OutboundPayload (
-    val matchUps: List<MatchUpStats>
+    val matchUps: List<MatchUpStats>,
+    val rankings: List<EngineRanking>
 )

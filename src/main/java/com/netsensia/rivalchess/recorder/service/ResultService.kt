@@ -1,10 +1,8 @@
 package com.netsensia.rivalchess.recorder.service
 
-import com.netsensia.rivalchess.recorder.model.Result
-import com.netsensia.rivalchess.recorder.model.ResultRepository
-import org.springframework.beans.factory.annotation.Autowired
+import com.netsensia.rivalchess.recorder.entity.Result
+import com.netsensia.rivalchess.recorder.entity.ResultRepository
 import org.springframework.stereotype.Component
-import org.springframework.stereotype.Service
 
 @Component
 class ResultService(private val repository: ResultRepository) {

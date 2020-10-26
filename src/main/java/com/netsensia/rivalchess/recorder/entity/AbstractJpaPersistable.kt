@@ -1,4 +1,4 @@
-package com.netsensia.rivalchess.recorder.model
+package com.netsensia.rivalchess.recorder.entity
 
 import org.springframework.data.domain.Persistable
 import org.springframework.data.util.ProxyUtils

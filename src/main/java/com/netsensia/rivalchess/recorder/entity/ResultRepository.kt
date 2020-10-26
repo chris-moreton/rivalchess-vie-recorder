@@ -1,4 +1,4 @@
-package com.netsensia.rivalchess.recorder.model
+package com.netsensia.rivalchess.recorder.entity
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query

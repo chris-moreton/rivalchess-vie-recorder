@@ -1,13 +1,13 @@
 package com.netsensia.rivalchess.recorder
 
 import com.google.gson.Gson
-import com.netsensia.rivalchess.recorder.model.MatchUpMessageItem
-import com.netsensia.rivalchess.recorder.model.Result
+import com.netsensia.rivalchess.recorder.entity.Result
+import com.netsensia.rivalchess.recorder.service.OutboundPayload
 import com.netsensia.rivalchess.recorder.service.ResultService
 import com.netsensia.rivalchess.utils.JmsReceiver
-import com.netsensia.rivalchess.utils.JmsSender
 import com.netsensia.rivalchess.utils.pgnHeader
 import com.netsensia.rivalchess.vie.model.MatchResult
+import com.netsensia.rivalchess.vie.model.MatchUpStats
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
@@ -22,6 +22,7 @@ class SpringBootConsoleApplication : CommandLineRunner {
     @Autowired
     private lateinit var resultService: ResultService
     private val recordVersion = 4
+    private val statsApiEndpoint = System.getenv("STATS_API_ENDPOINT")
 
     private fun catchUp() {
         val results = resultService.getOldVersions(recordVersion)
@@ -62,15 +63,21 @@ class SpringBootConsoleApplication : CommandLineRunner {
             )
             resultService.save(entity)
             val matchUps = resultService.getMatchStats()
-            if (matchUps != null) {
 
-                val matchUpMessage = matchUps.stream().map {
-                    MatchUpMessageItem(it.engine1, it.engine2, it.result, it.cnt)
-                }.toList()
+            val matchUpList = matchUps.stream().map {
+                MatchUpStats(it.engine1, it.engine2, it.result, it.cnt)
+            }.toList()
 
-                println(matchUpMessage)
-                //JmsSender.send("StatisticsUpdated", matchUps)
-            }
+            val payload = gson.toJson(OutboundPayload(matchUpList))
+
+            println("Sending payload ${payload}")
+
+            khttp.post(
+                    url = "http://${statsApiEndpoint}/matchUpStats",
+                    data = payload,
+                    headers = mapOf(Pair("Content-Type", "application/json"))
+
+            )
             println("Running Catch Up")
             catchUp()
         } while (true)
@@ -83,3 +90,4 @@ class SpringBootConsoleApplication : CommandLineRunner {
         }
     }
 }
+

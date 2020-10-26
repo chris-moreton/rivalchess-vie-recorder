@@ -1,4 +1,4 @@
-package com.netsensia.rivalchess.recorder.model
+package com.netsensia.rivalchess.recorder.entity
 
 import javax.persistence.Column
 import javax.persistence.Entity

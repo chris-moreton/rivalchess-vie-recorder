@@ -127,7 +127,9 @@ class SpringBootConsoleApplication : CommandLineRunner {
             }
         }
 
-        return eloMap.values.toList()
+        return eloMap.values.stream()
+                .sorted(Comparator.comparingInt(EngineRanking::elo).reversed())
+                .toList()
     }
 
     private fun sendPayload() {
@@ -137,7 +139,8 @@ class SpringBootConsoleApplication : CommandLineRunner {
 
         val matchUpList = matchUps.stream().map {
             MatchUpStats(it.engine1, it.engine2, it.result, it.cnt)
-        }.toList()
+        }.sorted(Comparator.comparing(MatchUpStats::engine1).reversed())
+         .toList()
 
         val payload = gson.toJson(OutboundPayload(matchUpList, getRankingsList(matchUpList)))
 

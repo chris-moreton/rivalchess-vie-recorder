@@ -16,34 +16,11 @@ class MatchGeneratorTest {
     }
 
     @Test
-    fun testRankingsList1() {
+    fun testRankingsList() {
         val payload = MatchGeneratorTest::class.java.getResource("/matchUps1.json").readText()
         val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
         val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
         val engineRankings = getRankingsList(matchUpsList)
-        Assert.assertEquals(engineRankings.get(0).elo, 1336)
-        Assert.assertEquals(engineRankings.get(1).elo, 1328)
-        Assert.assertEquals(engineRankings.get(2).elo, 1303)
-        Assert.assertEquals(engineRankings.get(3).elo, 1280)
-        Assert.assertEquals(engineRankings.get(4).elo, 1249)
-        Assert.assertEquals(engineRankings.get(5).elo, 704)
-
-        println(engineRankings)
-    }
-
-    @Test
-    fun testRankingsList2() {
-        val payload = MatchGeneratorTest::class.java.getResource("/matchUps2.json").readText()
-        val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
-        val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
-        val engineRankings = getRankingsList(matchUpsList)
-        Assert.assertEquals(engineRankings.get(0).elo, 1336)
-        Assert.assertEquals(engineRankings.get(1).elo, 1328)
-        Assert.assertEquals(engineRankings.get(2).elo, 1303)
-        Assert.assertEquals(engineRankings.get(3).elo, 1280)
-        Assert.assertEquals(engineRankings.get(4).elo, 1249)
-        Assert.assertEquals(engineRankings.get(5).elo, 704)
-
-        println(engineRankings)
+        Assert.assertEquals(engineRankings.get(0).name, "34.0.3")
     }
 }

@@ -2,7 +2,8 @@ package com.netsensia.rivalchess.recorder
 
 import com.netsensia.rivalchess.vie.model.EngineRanking
 import com.netsensia.rivalchess.vie.model.MatchUpStats
-import kotlin.random.Random
+import java.util.*
+import kotlin.Comparator
 import kotlin.streams.toList
 
 fun eloCalc(elo1: Int, elo2: Int, result: String): Pair<Int, Int> {
@@ -56,37 +57,34 @@ fun calculate2PlayersRating(player1Rating: Int, player2Rating: Int, outcome: Str
 }
 
 fun getRankingsList(matchUpList: List<MatchUpStats>): List<EngineRanking> {
-    val matchCount = matchUpList.sumBy { it.cnt }
 
-    val randomCeil = ((matchCount / 100000) + 1) * 100000
     val eloMap = mutableMapOf<String, EngineRanking>()
+    val resultsMap = mutableMapOf<UUID, MatchUpStats>()
+    matchUpList.forEach { matchUpStats ->
+        (0 until matchUpStats.cnt).forEach { resultsMap.put(UUID.randomUUID(), matchUpStats) }
+    }
 
-    val random = Random(1)
-    (0..100000).forEach outer@{
-        val r = random.nextInt(randomCeil)
-        var pos = 0
-        matchUpList.forEach {
-            pos += it.cnt
-            if (pos > r) {
-                eloMap.putIfAbsent(it.engine1, EngineRanking(it.engine1, 1200, 0))
-                eloMap.putIfAbsent(it.engine2, EngineRanking(it.engine2, 1200, 0))
+    val resultsKeys = listOf(*(resultsMap.keys.shuffled().toTypedArray()))
 
-                val elo1 = eloMap.get(it.engine1)!!.elo
-                val elo2 = eloMap.get(it.engine2)!!.elo
-                val newElos = eloCalc(elo1, elo2, it.result)
+    resultsKeys.forEach {
+        val result = resultsMap[it]!!
 
-                eloMap.set(it.engine1, EngineRanking(
-                        it.engine1,
-                        newElos.first,
-                        eloMap.get(it.engine1)!!.played + 1))
+        eloMap.putIfAbsent(result.engine1, EngineRanking(result.engine1, 1200, 0))
+        eloMap.putIfAbsent(result.engine2, EngineRanking(result.engine2, 1200, 0))
 
-                eloMap.set(it.engine2, EngineRanking(
-                        it.engine2,
-                        newElos.second,
-                        eloMap.get(it.engine2)!!.played + 1))
-                return@outer
-            }
-        }
+        val elo1 = eloMap.get(result.engine1)!!.elo
+        val elo2 = eloMap.get(result.engine2)!!.elo
+        val newElos = eloCalc(elo1, elo2, result.result)
+
+        eloMap.set(result.engine1, EngineRanking(
+                result.engine1,
+                newElos.first,
+                eloMap.get(result.engine1)!!.played + 1))
+
+        eloMap.set(result.engine2, EngineRanking(
+                result.engine2,
+                newElos.second,
+                eloMap.get(result.engine2)!!.played + 1))
     }
 
     println("Returning sorted rankings")

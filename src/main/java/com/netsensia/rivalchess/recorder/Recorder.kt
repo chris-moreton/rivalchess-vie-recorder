@@ -54,14 +54,15 @@ class SpringBootConsoleApplication : CommandLineRunner {
     private fun processQueueMessage() {
         val gson = Gson()
         val message = JmsReceiver.receive("MatchResulted")
+        println("Got message ${message}")
         val matchResult = gson.fromJson(message, MatchResult::class.java)
         val entity = Result(
-                engine1 = matchResult.engineSettings.engine1.version,
-                engine2 = matchResult.engineSettings.engine2.version,
-                nodes1 = matchResult.engineSettings.engine1.maxNodes,
-                nodes2 = matchResult.engineSettings.engine2.maxNodes,
-                millis1 = matchResult.engineSettings.engine1.maxMillis,
-                millis2 = matchResult.engineSettings.engine2.maxMillis,
+                engine1 = matchResult.engineMatch.engine1.version,
+                engine2 = matchResult.engineMatch.engine2.version,
+                nodes1 = matchResult.engineMatch.engine1.maxNodes,
+                nodes2 = matchResult.engineMatch.engine2.maxNodes,
+                millis1 = matchResult.engineMatch.engine1.maxMillis,
+                millis2 = matchResult.engineMatch.engine2.maxMillis,
                 result = pgnHeader(matchResult.pgn, "Result"),
                 ply_count = pgnHeader(matchResult.pgn, "PlyCount").toInt(),
                 opening = pgnHeader(matchResult.pgn, "Opening"),

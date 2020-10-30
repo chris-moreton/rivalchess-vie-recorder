@@ -1,6 +1,7 @@
 package com.netsensia.rivalchess.recorder
 
 import com.google.gson.Gson
+import com.netsensia.rivalchess.recorder.entity.MatchUp
 import com.netsensia.rivalchess.recorder.entity.Result
 import com.netsensia.rivalchess.recorder.service.OutboundPayload
 import com.netsensia.rivalchess.recorder.service.ResultService
@@ -8,6 +9,7 @@ import com.netsensia.rivalchess.utils.JmsReceiver
 import com.netsensia.rivalchess.utils.pgnHeader
 import com.netsensia.rivalchess.vie.model.MatchResult
 import com.netsensia.rivalchess.vie.model.MatchUpStats
+import com.netsensia.rivalchess.vie.model.MatchUpStatsConsolidated
 import khttp.post
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
@@ -77,13 +79,13 @@ class SpringBootConsoleApplication : CommandLineRunner {
         val gson = Gson()
 
         val matchUps = resultService.getMatchStats()
+        val matchUpList = getMatchUpList(matchUps)
 
-        val matchUpList = matchUps.stream().map {
-            MatchUpStats(it.engine1, it.engine2, it.result, it.cnt)
-        }.sorted(Comparator.comparing(MatchUpStats::engine1).reversed())
-         .toList()
-
-        val payload = gson.toJson(OutboundPayload(matchUpList, getRankingsList(matchUpList)))
+        val payload = gson.toJson(OutboundPayload(
+                matchUpList,
+                getRankingsList(matchUpList),
+                getMatchUpListConsolidated(matchUpList))
+        )
 
         println("Sending payload ${payload}")
 

@@ -1,7 +1,9 @@
 package com.netsensia.rivalchess.recorder
 
+import com.netsensia.rivalchess.recorder.entity.MatchUp
 import com.netsensia.rivalchess.vie.model.EngineRanking
 import com.netsensia.rivalchess.vie.model.MatchUpStats
+import com.netsensia.rivalchess.vie.model.MatchUpStatsConsolidated
 import java.util.*
 import kotlin.Comparator
 import kotlin.streams.toList
@@ -56,12 +58,19 @@ fun calculate2PlayersRating(player1Rating: Int, player2Rating: Int, outcome: Str
     return Math.round(player1Rating + K * (actualScore - expectedOutcome)).toInt()
 }
 
-fun getRankingsList(matchUpList: List<MatchUpStats>): List<EngineRanking> {
+fun getMatchUpList(matchUps: List<MatchUp>): List<MatchUpStats> {
+    val matchUpList = matchUps.stream().map {
+        MatchUpStats(it.engine1, it.engine2, it.result, it.cnt)
+    }.sorted(Comparator.comparing(MatchUpStats::engine1).reversed()).toList()
+    return matchUpList
+}
+
+fun getRankingsList(matchUpStatsList: List<MatchUpStats>): List<EngineRanking> {
 
     val eloMap = mutableMapOf<String, EngineRanking>()
     val resultsMap = mutableMapOf<Int, MatchUpStats>()
     val random = Random(1)
-    matchUpList.forEach { matchUpStats ->
+    matchUpStatsList.forEach { matchUpStats ->
         (0 until matchUpStats.cnt).forEach {
             resultsMap.put(random.nextInt(), matchUpStats)
         }
@@ -94,4 +103,55 @@ fun getRankingsList(matchUpList: List<MatchUpStats>): List<EngineRanking> {
     return eloMap.values.stream()
             .sorted(Comparator.comparingInt(EngineRanking::elo).reversed())
             .toList()
+}
+
+fun engine1Inc(result: String) = if (result.equals("1-0")) 1 else 0
+fun engine2Inc(result: String) = if (result.equals("0-1")) 1 else 0
+fun drawInc(result: String) = if (result.equals("1/2-1/2")) 1 else 0
+fun engine1AsWhiteInc(whiteEngine: String, thisEngine: String) = if (whiteEngine.equals(thisEngine)) 1 else 0
+
+fun reverseResult(result: String) =
+        when (result) {
+            "1-0" -> "0-1"
+            "0-1" -> "1-0"
+            else -> "1/2-1/2"
+        }
+
+fun getMatchUpListConsolidated(matchUpStatsList: List<MatchUpStats>): List<MatchUpStatsConsolidated> {
+    val map = mutableMapOf<String, MatchUpStatsConsolidated>()
+
+    matchUpStatsList.forEach { matchUp ->
+        if (!matchUp.engine1.equals(matchUp.engine2)) {
+
+            val localEngine1 = if (matchUp.engine1.compareTo(matchUp.engine2) == -1) matchUp.engine1 else matchUp.engine2
+            val localEngine2 = if (matchUp.engine1.compareTo(matchUp.engine2) == 1) matchUp.engine1 else matchUp.engine2
+            val localResult = if (localEngine1.equals(matchUp.engine1)) matchUp.result else reverseResult(matchUp.result)
+
+            val key = "${localEngine1}_v_${localEngine2}"
+
+            val consolidatedStats = map.getOrDefault(
+                    key,
+                    MatchUpStatsConsolidated(
+                            localEngine1,
+                            localEngine2,
+                            0,
+                            0,
+                            0,
+                            0)
+            )
+
+            val newConsolidatedStats = MatchUpStatsConsolidated(
+                    consolidatedStats.engine1,
+                    consolidatedStats.engine2,
+                    consolidatedStats.engine1Wins + engine1Inc(localResult),
+                    consolidatedStats.draws + drawInc(localResult),
+                    consolidatedStats.engine2Wins + engine2Inc(localResult),
+                    consolidatedStats.engine1AsWhiteCount + engine1AsWhiteInc(matchUp.engine1, localEngine1)
+            )
+
+            map.put(key, newConsolidatedStats)
+        }
+    }
+
+    return map.values.toList()
 }

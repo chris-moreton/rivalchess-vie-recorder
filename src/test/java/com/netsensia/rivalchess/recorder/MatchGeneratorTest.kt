@@ -21,6 +21,6 @@ class MatchGeneratorTest {
         val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
         val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
         val engineRankings = getRankingsList(matchUpsList)
-        Assert.assertEquals(engineRankings.get(0).name, "34.0.3")
+        Assert.assertEquals(engineRankings.get(0).name, "34.0.2")
     }
 }

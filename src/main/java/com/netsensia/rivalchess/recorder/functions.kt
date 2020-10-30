@@ -143,10 +143,10 @@ fun getMatchUpListConsolidated(matchUpStatsList: List<MatchUpStats>): List<Match
             val newConsolidatedStats = MatchUpStatsConsolidated(
                     consolidatedStats.engine1,
                     consolidatedStats.engine2,
-                    consolidatedStats.engine1Wins + engine1Inc(localResult),
-                    consolidatedStats.draws + drawInc(localResult),
-                    consolidatedStats.engine2Wins + engine2Inc(localResult),
-                    consolidatedStats.engine1AsWhiteCount + engine1AsWhiteInc(matchUp.engine1, localEngine1)
+                    consolidatedStats.engine1Wins + (engine1Inc(localResult) * matchUp.cnt),
+                    consolidatedStats.draws + (drawInc(localResult) * matchUp.cnt),
+                    consolidatedStats.engine2Wins + (engine2Inc(localResult) * matchUp.cnt),
+                    consolidatedStats.engine1AsWhiteCount + (engine1AsWhiteInc(matchUp.engine1, localEngine1) * matchUp.cnt)
             )
 
             map.put(key, newConsolidatedStats)

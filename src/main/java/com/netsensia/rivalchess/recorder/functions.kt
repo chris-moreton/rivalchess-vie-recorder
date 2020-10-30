@@ -59,12 +59,15 @@ fun calculate2PlayersRating(player1Rating: Int, player2Rating: Int, outcome: Str
 fun getRankingsList(matchUpList: List<MatchUpStats>): List<EngineRanking> {
 
     val eloMap = mutableMapOf<String, EngineRanking>()
-    val resultsMap = mutableMapOf<UUID, MatchUpStats>()
+    val resultsMap = mutableMapOf<Int, MatchUpStats>()
+    val random = Random(1)
     matchUpList.forEach { matchUpStats ->
-        (0 until matchUpStats.cnt).forEach { resultsMap.put(UUID.randomUUID(), matchUpStats) }
+        (0 until matchUpStats.cnt).forEach {
+            resultsMap.put(random.nextInt(), matchUpStats)
+        }
     }
 
-    val resultsKeys = listOf(*(resultsMap.keys.shuffled().toTypedArray()))
+    val resultsKeys = listOf(*(resultsMap.keys.sorted().toTypedArray()))
 
     resultsKeys.forEach {
         val result = resultsMap[it]!!

@@ -25,7 +25,7 @@ class MatchGeneratorTest {
     }
 
     @Test
-    fun testConsolidatedMatchUpsList() {
+    fun testConsolidatedMatchUpsList1() {
         val payload = MatchGeneratorTest::class.java.getResource("/matchUps1.json").readText()
         val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
         val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
@@ -36,5 +36,19 @@ class MatchGeneratorTest {
         Assert.assertEquals(consolidated.get(0).engine2Wins, 964)
         Assert.assertEquals(consolidated.get(0).draws, 1115)
         Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 1521)
+    }
+
+    @Test
+    fun testConsolidatedMatchUpsList2() {
+        val payload = MatchGeneratorTest::class.java.getResource("/matchUps2.json").readText()
+        val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
+        val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
+        val consolidated = getMatchUpListConsolidated(matchUpsList)
+        Assert.assertEquals(consolidated.get(0).engine1, "00.0.1")
+        Assert.assertEquals(consolidated.get(0).engine2, "cuckoo110")
+        Assert.assertEquals(consolidated.get(0).engine1Wins, 0)
+        Assert.assertEquals(consolidated.get(0).engine2Wins, 148)
+        Assert.assertEquals(consolidated.get(0).draws, 15)
+        Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 85)
     }
 }

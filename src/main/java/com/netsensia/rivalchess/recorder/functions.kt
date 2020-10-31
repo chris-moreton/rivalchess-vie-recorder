@@ -123,8 +123,8 @@ fun getMatchUpListConsolidated(matchUpStatsList: List<MatchUpStats>): List<Match
     matchUpStatsList.forEach { matchUp ->
         if (!matchUp.engine1.equals(matchUp.engine2)) {
 
-            val localEngine1 = if (matchUp.engine1.compareTo(matchUp.engine2) == -1) matchUp.engine1 else matchUp.engine2
-            val localEngine2 = if (matchUp.engine1.compareTo(matchUp.engine2) == 1) matchUp.engine1 else matchUp.engine2
+            val localEngine1 = if (matchUp.engine1.compareTo(matchUp.engine2) < 0) matchUp.engine1 else matchUp.engine2
+            val localEngine2 = if (matchUp.engine1.compareTo(matchUp.engine2) > 0) matchUp.engine1 else matchUp.engine2
             val localResult = if (localEngine1.equals(matchUp.engine1)) matchUp.result else reverseResult(matchUp.result)
 
             val key = "${localEngine1}_v_${localEngine2}"

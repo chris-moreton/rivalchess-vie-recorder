@@ -131,27 +131,36 @@ fun getMatchUpListConsolidated(matchUpStatsList: List<MatchUpStats>): List<Match
 
             val consolidatedStats = map.getOrDefault(
                     key,
-                    MatchUpStatsConsolidated(
-                            localEngine1,
-                            localEngine2,
-                            0,
-                            0,
-                            0,
-                            0)
+                    MatchUpStatsConsolidated(localEngine1, localEngine2,0,0,0,0)
             )
 
-            val newConsolidatedStats = MatchUpStatsConsolidated(
+            val engine1AsWhiteCount = consolidatedStats.engine1AsWhiteCount + (engine1AsWhiteInc(matchUp.engine1, localEngine1) * matchUp.cnt)
+            val engine1Wins = consolidatedStats.engine1Wins + (engine1Inc(localResult) * matchUp.cnt)
+            val engine2Wins = consolidatedStats.engine2Wins + (engine2Inc(localResult) * matchUp.cnt)
+            val draws = consolidatedStats.draws + (drawInc(localResult) * matchUp.cnt)
+            val total = engine1Wins + draws + engine2Wins
+
+            map.put(key, MatchUpStatsConsolidated(
                     consolidatedStats.engine1,
                     consolidatedStats.engine2,
-                    consolidatedStats.engine1Wins + (engine1Inc(localResult) * matchUp.cnt),
-                    consolidatedStats.draws + (drawInc(localResult) * matchUp.cnt),
-                    consolidatedStats.engine2Wins + (engine2Inc(localResult) * matchUp.cnt),
-                    consolidatedStats.engine1AsWhiteCount + (engine1AsWhiteInc(matchUp.engine1, localEngine1) * matchUp.cnt)
+                    engine1Wins,
+                    draws,
+                    engine2Wins,
+                    engine1AsWhiteCount)
             )
 
-            map.put(key, newConsolidatedStats)
+            val reverseKey = "${localEngine2}_v_${localEngine1}"
+
+            map.put(reverseKey, MatchUpStatsConsolidated(
+                    consolidatedStats.engine2,
+                    consolidatedStats.engine1,
+                    engine2Wins,
+                    draws,
+                    engine1Wins,
+                    total - engine1AsWhiteCount
+            ))
         }
     }
 
-    return map.values.toList()
+    return map.values.toList().sortedBy { "${it.engine1} - ${it.engine2}" }
 }

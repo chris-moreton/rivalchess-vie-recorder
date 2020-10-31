@@ -30,12 +30,12 @@ class MatchGeneratorTest {
         val listType: Type = object : TypeToken<List<MatchUpStats?>?>() {}.type
         val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
         val consolidated = getMatchUpListConsolidated(matchUpsList)
-        Assert.assertEquals(consolidated.get(0).engine1, "34.0.3")
-        Assert.assertEquals(consolidated.get(0).engine2, "34.0.4")
-        Assert.assertEquals(consolidated.get(0).engine1Wins, 963)
-        Assert.assertEquals(consolidated.get(0).engine2Wins, 964)
-        Assert.assertEquals(consolidated.get(0).draws, 1115)
-        Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 1521)
+        Assert.assertEquals(consolidated.get(0).engine1, "00.0.1")
+        Assert.assertEquals(consolidated.get(0).engine2, "34.0.3")
+        Assert.assertEquals(consolidated.get(0).engine1Wins, 5)
+        Assert.assertEquals(consolidated.get(0).engine2Wins, 283)
+        Assert.assertEquals(consolidated.get(0).draws, 15)
+        Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 150)
     }
 
     @Test
@@ -45,10 +45,10 @@ class MatchGeneratorTest {
         val matchUpsList = Gson().fromJson<List<MatchUpStats>>(payload, listType)
         val consolidated = getMatchUpListConsolidated(matchUpsList)
         Assert.assertEquals(consolidated.get(0).engine1, "00.0.1")
-        Assert.assertEquals(consolidated.get(0).engine2, "cuckoo110")
-        Assert.assertEquals(consolidated.get(0).engine1Wins, 0)
-        Assert.assertEquals(consolidated.get(0).engine2Wins, 148)
-        Assert.assertEquals(consolidated.get(0).draws, 15)
-        Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 85)
+        Assert.assertEquals(consolidated.get(0).engine2, "34.0.0")
+        Assert.assertEquals(consolidated.get(0).engine1Wins, 3)
+        Assert.assertEquals(consolidated.get(0).engine2Wins, 138)
+        Assert.assertEquals(consolidated.get(0).draws, 14)
+        Assert.assertEquals(consolidated.get(0).engine1AsWhiteCount, 79)
     }
 }

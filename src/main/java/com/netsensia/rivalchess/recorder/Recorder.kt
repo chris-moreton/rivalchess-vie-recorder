@@ -1,22 +1,19 @@
 package com.netsensia.rivalchess.recorder
 
 import com.google.gson.Gson
-import com.netsensia.rivalchess.recorder.entity.MatchUp
 import com.netsensia.rivalchess.recorder.entity.Result
 import com.netsensia.rivalchess.recorder.service.OutboundPayload
 import com.netsensia.rivalchess.recorder.service.ResultService
-import com.netsensia.rivalchess.utils.JmsReceiver
+import com.netsensia.rivalchess.utils.JmsService
+import com.netsensia.rivalchess.utils.interfaces.JmsServiceInterface
 import com.netsensia.rivalchess.utils.pgnHeader
 import com.netsensia.rivalchess.vie.model.MatchResult
-import com.netsensia.rivalchess.vie.model.MatchUpStats
-import com.netsensia.rivalchess.vie.model.MatchUpStatsConsolidated
 import khttp.post
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.stereotype.Component
-import kotlin.streams.toList
 
 @SpringBootApplication
 @Component
@@ -26,12 +23,17 @@ class SpringBootConsoleApplication : CommandLineRunner {
     private lateinit var resultService: ResultService
     private val recordVersion = 4
     private val statsApiEndpoint = System.getenv("STATS_API_ENDPOINT")
+    private val jmsService = JmsService()
 
     override fun run(vararg args: String) {
         do {
-            processQueueMessage()
-            sendPayload()
-            catchUp()
+            try {
+                processQueueMessage()
+                sendPayload()
+                catchUp()
+            } catch (e: Exception) {
+                println(e.message)
+            }
         } while (true)
     }
 
@@ -55,7 +57,7 @@ class SpringBootConsoleApplication : CommandLineRunner {
 
     private fun processQueueMessage() {
         val gson = Gson()
-        val message = JmsReceiver.receive("MatchResulted")
+        val message = jmsService.receive("MatchResulted")
         println("Got message ${message}")
         val matchResult = gson.fromJson(message, MatchResult::class.java)
         val entity = Result(

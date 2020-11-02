@@ -33,6 +33,7 @@ class SpringBootConsoleApplication : CommandLineRunner {
                 catchUp()
             } catch (e: Exception) {
                 println(e.message)
+                Thread.sleep(5000)
             }
         } while (true)
     }

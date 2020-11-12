@@ -75,20 +75,18 @@ fun getRankingsListWithVieRanking(
         updatedRankingsList.putIfAbsent(matchUpConsolidated.engine1,
                 rankingsList.filter { it.name == matchUpConsolidated.engine1 }.first())
         val currentRanking = updatedRankingsList.get(matchUpConsolidated.engine1)
-        if (matchUpConsolidated.engine1Wins > matchUpConsolidated.engine2Wins) {
-            val winPercent =
-                    (matchUpConsolidated.engine1Wins.toDouble() /
-                            (matchUpConsolidated.engine1Wins + matchUpConsolidated.engine2Wins).toDouble()) * 100.0
+        val winPercent =
+                (matchUpConsolidated.engine1Wins.toDouble() /
+                        (matchUpConsolidated.engine1Wins + matchUpConsolidated.engine2Wins).toDouble()) * 100.0
 
-            val points = (winPercent - 50).toInt()
+        val points = (winPercent - 50).toInt()
 
-            updatedRankingsList.put(matchUpConsolidated.engine1,
-                    EngineRanking(currentRanking!!.name,
-                            currentRanking!!.elo,
-                            currentRanking!!.played,
-                            currentRanking!!.vie + points)
-            )
-        }
+        updatedRankingsList.put(matchUpConsolidated.engine1,
+                EngineRanking(currentRanking!!.name,
+                        currentRanking!!.elo,
+                        currentRanking!!.played,
+                        currentRanking!!.vie + points)
+        )
     }
     return updatedRankingsList.values.toList().sortedBy { it.vie }.reversed()
 }

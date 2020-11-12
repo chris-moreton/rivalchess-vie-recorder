@@ -65,6 +65,34 @@ fun getMatchUpList(matchUps: List<MatchUp>): List<MatchUpStats> {
     return matchUpList
 }
 
+fun getRankingsListWithVieRanking(
+        rankingsList: List<EngineRanking>,
+        matchUpListConsolidated: List<MatchUpStatsConsolidated>): List<EngineRanking> {
+
+    val updatedRankingsList = mutableMapOf<String, EngineRanking>()
+
+    matchUpListConsolidated.forEach { matchUpConsolidated ->
+        updatedRankingsList.putIfAbsent(matchUpConsolidated.engine1,
+                rankingsList.filter { it.name == matchUpConsolidated.engine1 }.first())
+        val currentRanking = updatedRankingsList.get(matchUpConsolidated.engine1)
+        if (matchUpConsolidated.engine1Wins > matchUpConsolidated.engine2Wins) {
+            val winPercent =
+                    (matchUpConsolidated.engine1Wins.toDouble() /
+                            (matchUpConsolidated.engine1Wins + matchUpConsolidated.engine2Wins).toDouble()) * 100.0
+
+            val points = (winPercent - 50).toInt()
+
+            updatedRankingsList.put(matchUpConsolidated.engine1,
+                    EngineRanking(currentRanking!!.name,
+                            currentRanking!!.elo,
+                            currentRanking!!.played,
+                            currentRanking!!.vie + points)
+            )
+        }
+    }
+    return updatedRankingsList.values.toList().sortedBy { it.vie }.reversed()
+}
+
 fun getRankingsList(matchUpStatsList: List<MatchUpStats>): List<EngineRanking> {
 
     val eloMap = mutableMapOf<String, EngineRanking>()
@@ -81,8 +109,8 @@ fun getRankingsList(matchUpStatsList: List<MatchUpStats>): List<EngineRanking> {
     resultsKeys.forEach {
         val result = resultsMap[it]!!
 
-        eloMap.putIfAbsent(result.engine1, EngineRanking(result.engine1, 1200, 0))
-        eloMap.putIfAbsent(result.engine2, EngineRanking(result.engine2, 1200, 0))
+        eloMap.putIfAbsent(result.engine1, EngineRanking(result.engine1, 1200, 0, 0))
+        eloMap.putIfAbsent(result.engine2, EngineRanking(result.engine2, 1200, 0, 0))
 
         val elo1 = eloMap.get(result.engine1)!!.elo
         val elo2 = eloMap.get(result.engine2)!!.elo
@@ -91,17 +119,21 @@ fun getRankingsList(matchUpStatsList: List<MatchUpStats>): List<EngineRanking> {
         eloMap.set(result.engine1, EngineRanking(
                 result.engine1,
                 newElos.first,
-                eloMap.get(result.engine1)!!.played + 1))
+                eloMap.get(result.engine1)!!.played + 1,
+                eloMap.get(result.engine1)!!.vie)
+        )
 
         eloMap.set(result.engine2, EngineRanking(
                 result.engine2,
                 newElos.second,
-                eloMap.get(result.engine2)!!.played + 1))
+                eloMap.get(result.engine2)!!.played + 1,
+                eloMap.get(result.engine2)!!.vie)
+        )
     }
 
     println("Returning sorted rankings")
     return eloMap.values.stream()
-            .sorted(Comparator.comparingInt(EngineRanking::elo).reversed())
+            .sorted(Comparator.comparing(EngineRanking::name).reversed())
             .toList()
 }
 

@@ -14,6 +14,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.stereotype.Component
+import kotlin.random.Random
 
 @SpringBootApplication
 @Component
@@ -30,7 +31,7 @@ class SpringBootConsoleApplication : CommandLineRunner {
             try {
                 processQueueMessage()
                 sendPayload()
-                catchUp()
+                // catchUp()
             } catch (e: Exception) {
                 println(e.message)
                 Thread.sleep(5000)
@@ -83,11 +84,14 @@ class SpringBootConsoleApplication : CommandLineRunner {
 
         val matchUps = resultService.getMatchStats()
         val matchUpList = getMatchUpList(matchUps)
+        val matchUpListConsolidated = getMatchUpListConsolidated(matchUpList)
+        val rankingsList = getRankingsList(matchUpList)
+        val rankingsListWithVieRanking = getRankingsListWithVieRanking(rankingsList, matchUpListConsolidated)
 
         val payload = gson.toJson(OutboundPayload(
                 matchUpList,
-                getRankingsList(matchUpList),
-                getMatchUpListConsolidated(matchUpList))
+                rankingsListWithVieRanking,
+                matchUpListConsolidated)
         )
 
         println("Sending payload ${payload}")
